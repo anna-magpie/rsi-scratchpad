@@ -2,15 +2,10 @@
 qn: 5
 title: Misalignment takes a power-seeking form
 short: Power-seeking
-status: Mainly theoretical
-status_class: weak
-blurb: Instrumental convergence is mainly argument; empirical support is limited to self-preservation and access escalation in evals.
+blurb: Whether that misalignment shows up as seeking power, resources or self-preservation, rather than in more benign forms.
+# Add your own rating when ready, e.g.:
+# status: Best-supported link
+# status_class: strong   # strong | moderate | open | weak | crux
 ---
 
-Instrumental convergence is mainly a theoretical argument. Empirical support is limited to self-preservation and access-escalation behaviours in evaluations.
-
-The Mythos report notes attempts to escalate access when blocked during training, described as mitigated but not eliminated.
-
-### Open threads
-
-- Can toy environments show how often power-seeking emerges from random or near-random goals, and how that scales with horizon length?
+Whether that misalignment shows up as seeking power, resources or self-preservation, rather than in more benign forms.

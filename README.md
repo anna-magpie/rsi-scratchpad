@@ -17,6 +17,15 @@ summary: One line shown in listings.
 
 Commit and push to `main`. Pages rebuilds in about a minute.
 
+## Rate a link
+
+Each link lives in `_questions/`. Write the evidence in the body as Markdown, and add a support badge to the front matter:
+
+```yaml
+status: Best-supported link
+status_class: strong   # strong | moderate | open | weak | crux (sets the colour)
+```
+
 ## Layout
 
 | Path | What |

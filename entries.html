@@ -22,6 +22,7 @@ permalink: /entries/
   </li>
 {% endfor %}
 </ul>
+{% if site.posts.size == 0 %}<p class="empty">No entries yet.</p>{% endif %}
 <script>
 document.querySelectorAll('.filters .chip').forEach(function (b) {
   b.addEventListener('click', function () {

@@ -2,16 +2,10 @@
 qn: 3
 title: The result is capable enough to disempower humanity
 short: Decisive capability
-status: Mostly argument
-status_class: weak
-blurb: Indirect evidence only. Nothing bears directly on whether cognitive advantage converts into decisive real-world power.
+blurb: Whether the resulting systems are capable enough that, if they acted against humanity, they could disempower it.
+# Add your own rating when ready, e.g.:
+# status: Best-supported link
+# status_class: strong   # strong | moderate | open | weak | crux
 ---
 
-The evidence is indirect: superhuman performance in narrow domains and rapidly rising cyber capability.
-
-Nothing bears directly on whether cognitive advantage converts into decisive real-world power, or how much physical bottlenecks (robotics, manufacturing, experiment time) bind. This rests mostly on argument.
-
-### Open threads
-
-- Can we model the conversion rate from cognitive lead to physical/strategic lead, with explicit bottleneck terms?
-- Which physical bottlenecks are slow to relax even with abundant superhuman labour?
+Whether the resulting systems are capable enough that, if they acted against humanity, they could disempower it.

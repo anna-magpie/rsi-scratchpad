@@ -21,7 +21,7 @@ layout: default
           <span class="chain-blurb">{{ q.blurb }}</span>
         </span>
         <span class="chain-side">
-          <span class="status status-{{ q.status_class }}">{{ q.status }}</span>
+          {% if q.status %}<span class="status status-{{ q.status_class }}">{{ q.status }}</span>{% endif %}
           <span class="chain-count">{{ n }} {% if n == 1 %}entry{% else %}entries{% endif %}</span>
         </span>
       </a>
@@ -42,5 +42,6 @@ layout: default
     </li>
   {% endfor %}
   </ul>
-  <p><a href="{{ '/entries/' | relative_url }}">All entries →</a></p>
+  {% if site.posts.size == 0 %}<p class="empty">No entries yet.</p>{% else %}
+  <p><a href="{{ '/entries/' | relative_url }}">All entries →</a></p>{% endif %}
 </section>
