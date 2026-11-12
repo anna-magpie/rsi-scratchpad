@@ -31,6 +31,6 @@ Each entry is tagged with the links it bears on, so every question page collects
 
 ## Adding an entry
 
-See the [README on GitHub](https://github.com/) for the exact recipe. In short: drop a file in `_posts/` named `YYYY-MM-DD-slug.md` (or `.html` for an interactive experiment), set `kind` and `questions` in the front matter, and push.
+See the [README on GitHub](https://github.com/anna-magpie/rsi-scratchpad#readme) for the exact recipe. In short: drop a file in `_posts/` named `YYYY-MM-DD-slug.md` (or `.html` for an interactive experiment), set `kind` and `questions` in the front matter, and push.
 
 </div>
