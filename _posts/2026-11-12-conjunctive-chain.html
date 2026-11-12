@@ -1,0 +1,93 @@
+---
+title: The conjunctive chain calculator
+kind: experiment
+questions: [1, 2, 3, 4, 5, 6, 7]
+summary: Put a conditional probability on each of the seven links and see where the product lands, and which link is doing the most work.
+---
+<div class="prose">
+<p>Each slider is a <strong>conditional</strong> probability: the chance this link holds <em>given that every earlier link held</em>. Read that way, multiplying them is exact. Most of the classic "conjunctive fallacy" objection comes from people setting each link as if it were independent of the others.</p>
+<p>The defaults are placeholders, not anyone's estimate. Drag them to your own numbers. The URL updates as you go, so you can share a configuration.</p>
+</div>
+
+<div class="panel">
+  <div class="controls" id="sliders"></div>
+  <div class="stat-row">
+    <div class="stat"><div class="v" id="s-prod"></div><div class="l">P(all seven links hold)</div></div>
+    <div class="stat"><div class="v" id="s-weak"></div><div class="l">weakest link</div></div>
+    <div class="stat"><div class="v" id="s-lever"></div><div class="l">biggest lever: product if the weakest link were certain</div></div>
+  </div>
+  <div id="cum"></div>
+  <p class="note">Bars show the running product: the probability that links 1 through <em>n</em> all hold.</p>
+  <button class="chip" id="reset" type="button">Reset to placeholders</button>
+</div>
+
+<div class="prose">
+<h2>Things to try</h2>
+<ul>
+  <li>Set every link to 0.7. The product is 8%, which feels low for a chain where each link is "likely". Then ask whether 0.7 was really your <em>conditional</em> credence. Given links 1 to 3, isn't link 4 more likely?</li>
+  <li>Find the one link where moving from your value to 1.0 changes the product the most. That is where evidence is most valuable to you.</li>
+</ul>
+</div>
+
+<script>
+(function () {
+  var LINKS = [
+    ['Q1', 'AI substantially automates AI R&D'],
+    ['Q2', 'The loop compounds'],
+    ['Q3', 'Capable enough to disempower'],
+    ['Q4', 'Misaligned by default'],
+    ['Q5', 'Power-seeking form'],
+    ['Q6', 'Oversight fails in time'],
+    ['Q7', 'No adequate response; extinction']
+  ];
+  var DEFAULTS = [0.8, 0.6, 0.6, 0.4, 0.6, 0.5, 0.5];
+  var host = document.getElementById('sliders');
+
+  function fromHash() {
+    var m = location.hash.match(/p=([\d.,]+)/);
+    if (!m) return null;
+    var v = m[1].split(',').map(Number);
+    return v.length === 7 && v.every(function (x) { return x >= 0 && x <= 1; }) ? v : null;
+  }
+  var vals = fromHash() || DEFAULTS.slice();
+
+  LINKS.forEach(function (l, i) {
+    var d = document.createElement('div');
+    d.className = 'control';
+    d.innerHTML = '<label for="l' + i + '"><span>' + l[0] + ' · ' + l[1] + '</span><output id="o' + i + '"></output></label>' +
+      '<input id="l' + i + '" type="range" min="0" max="1" step="0.01">';
+    host.appendChild(d);
+    var inp = d.querySelector('input');
+    inp.value = vals[i];
+    inp.addEventListener('input', function () { vals[i] = +inp.value; render(); });
+  });
+
+  var pct = function (p) { return p >= 0.1 ? Math.round(p * 100) + '%' : p >= 0.001 ? (p * 100).toFixed(1) + '%' : '<0.1%'; };
+
+  function render() {
+    var cum = [], acc = 1;
+    vals.forEach(function (v, i) {
+      acc *= v; cum.push(acc);
+      document.getElementById('o' + i).textContent = v.toFixed(2);
+    });
+    var wi = vals.indexOf(Math.min.apply(null, vals));
+    document.getElementById('s-prod').textContent = pct(acc);
+    document.getElementById('s-weak').textContent = LINKS[wi][0] + ' at ' + vals[wi].toFixed(2);
+    document.getElementById('s-lever').textContent = vals[wi] > 0 ? pct(acc / vals[wi]) : 'n/a';
+    Viz.bars(document.getElementById('cum'), {
+      bars: cum.map(function (c, i) {
+        return { label: LINKS[i][0], value: c, tip: 'Links 1–' + (i + 1) + ' all hold', color: 'var(--series-1)', direct: i === cum.length - 1 };
+      }),
+      yDomain: [0, 1], fmtY: pct, yLabel: 'Running product', height: 240,
+      label: 'Running product of link probabilities'
+    });
+    history.replaceState(null, '', '#p=' + vals.map(function (v) { return v.toFixed(2); }).join(','));
+  }
+  document.getElementById('reset').addEventListener('click', function () {
+    vals = DEFAULTS.slice();
+    vals.forEach(function (v, i) { document.getElementById('l' + i).value = v; });
+    render();
+  });
+  render();
+})();
+</script>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} · {% endif %}{{ site.title }}</title>
+  <meta name="description" content="{{ page.summary | default: site.description | strip_html | escape }}">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <link rel="alternate" type="application/atom+xml" href="{{ '/feed.xml' | relative_url }}">
+  <script src="{{ '/assets/js/viz.js' | relative_url }}"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="{{ '/' | relative_url }}"><span class="brand-mark">∂</span> RSI Scratchpad</a>
+      <nav>
+        <a href="{{ '/#chain' | relative_url }}">The chain</a>
+        <a href="{{ '/entries/' | relative_url }}">Entries</a>
+        <a href="{{ '/about/' | relative_url }}">About</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap">
+    {{ content }}
+  </main>
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>Scratch work, not conclusions. Numbers in posts are quoted from sources as of writing; check before reusing.</span>
+    </div>
+  </footer>
+</body>
+</html>

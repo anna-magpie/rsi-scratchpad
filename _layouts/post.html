@@ -1,0 +1,20 @@
+---
+layout: default
+---
+{% assign qs = site.questions | sort: 'qn' %}
+<article class="entry">
+  <header class="entry-head">
+    <div class="meta">
+      <span class="kind kind-{{ page.kind }}">{{ page.kind }}</span>
+      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%-d %b %Y" }}</time>
+      {% for q in qs %}{% if page.questions contains q.qn %}
+        <a class="qtag" href="{{ q.url | relative_url }}">Q{{ q.qn }} · {{ q.short }}</a>
+      {% endif %}{% endfor %}
+    </div>
+    <h1>{{ page.title }}</h1>
+    {% if page.summary %}<p class="lede">{{ page.summary }}</p>{% endif %}
+  </header>
+  <div class="prose">
+    {{ content }}
+  </div>
+</article>

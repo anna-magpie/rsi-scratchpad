@@ -1,0 +1,148 @@
+---
+title: "Returns to software R&D: when does the loop explode?"
+kind: experiment
+questions: [1, 2]
+summary: A one-equation toy model of the software-only feedback loop. Drag r across 1 and watch growth flip from decelerating to finite-time blow-up.
+---
+<div class="prose">
+<p>Suppose AI fully automates software R&amp;D, so research effort scales with the software level <em>S</em> itself. In the semi-endogenous setup Forethought uses, the returns parameter <strong>r</strong> says how many doublings of software you get per doubling of cumulative research input. Writing <em>x</em> = log<sub>2</sub>&nbsp;S (doublings from today), the loop becomes</p>
+<pre><code>dx/dt = g₀ · 2^( β·(r − 1)·x )</code></pre>
+<p>where <em>g₀</em> is today's doublings per year and <em>β</em> is how fast ideas get harder to find. If r&nbsp;&gt;&nbsp;1 the growth rate rises with every doubling and <em>x</em> blows up in finite time. If r&nbsp;&lt;&nbsp;1 it slows. r&nbsp;=&nbsp;1 is a plain exponential. The model has a closed form, so nothing here is simulated:</p>
+<pre><code>x(t) = −log₂(1 − k·ln2·g₀·t) / k,   k = β(r − 1)</code></pre>
+<p>A <strong>ceiling</strong> stands in for physical limits: compute, data, and the cost of experiments. Past the ceiling, software-only progress stops.</p>
+</div>
+
+<div class="panel">
+  <div class="controls">
+    <div class="control"><label for="r">Returns to R&amp;D, r <output id="r-out"></output></label><input id="r" type="range" min="0.3" max="4" step="0.05" value="1.6"></div>
+    <div class="control"><label for="g0">Today's pace, doublings/yr <output id="g0-out"></output></label><input id="g0" type="range" min="0.5" max="6" step="0.25" value="2"></div>
+    <div class="control"><label for="beta">Ideas get harder, β <output id="beta-out"></output></label><input id="beta" type="range" min="0.1" max="1.5" step="0.05" value="0.5"></div>
+    <div class="control"><label for="cap">Ceiling, OOMs of software gain <output id="cap-out"></output></label><input id="cap" type="range" min="2" max="15" step="1" value="8"></div>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><div class="v" id="s-ceil"></div><div class="l">to hit the ceiling at your r</div></div>
+    <div class="stat"><div class="v" id="s-ceil1"></div><div class="l">to hit it at r = 1 (plain exponential)</div></div>
+    <div class="stat"><div class="v" id="s-blow"></div><div class="l">blow-up time, ignoring the ceiling</div></div>
+  </div>
+  <div id="traj"></div>
+  <details class="table-view"><summary>Show as table</summary><div class="table-scroll" id="traj-table"></div></details>
+</div>
+
+<div class="prose">
+<h2>How likely is r &gt; 1?</h2>
+<p>Forethought's median is about <strong>1.2</strong> with a range of <strong>0.4–3.6</strong>. Reading that range as a 90% interval of a lognormal gives σ ≈ 0.67. The range is symmetric in log space around 1.2, which fits that reading. The shaded area is P(r&nbsp;&gt;&nbsp;1). It reproduces their "roughly 60%" headline, which is a useful sanity check on the interpretation.</p>
+</div>
+
+<div class="panel">
+  <div class="stat-row">
+    <div class="stat"><div class="v" id="s-p1"></div><div class="l">P(r &gt; 1), the loop accelerates</div></div>
+    <div class="stat"><div class="v" id="s-pr"></div><div class="l">P(r &gt; your slider value)</div></div>
+  </div>
+  <div id="dist"></div>
+</div>
+
+<div class="prose">
+<h2>What this does and doesn't show</h2>
+<ul>
+  <li>Near r = 1 the answer is extremely sensitive. Moving r from 0.9 to 1.3 changes the qualitative regime, and that is about the width of our uncertainty. This is the CSET point in miniature: data that fits one regime also fits the other.</li>
+  <li>β matters as much as r for <em>timing</em> but not for the <em>sign</em>: acceleration happens iff r &gt; 1, whatever β is.</li>
+  <li>Everything binding outside software (compute growth, experiment latency, human-in-the-loop share) is crushed into the ceiling. A natural next experiment is to make compute a separate, slower-growing input.</li>
+  <li>Forethought call their own model "garbage in, garbage out". This toy is strictly worse. It is for building intuition, not for forecasting.</li>
+</ul>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var LN2 = Math.LN2;
+  var MED = 1.2, SIG = Math.log(3.6 / 1.2) / 1.6449;
+
+  function erf(x) { // Abramowitz & Stegun 7.1.26
+    var s = x < 0 ? -1 : 1; x = Math.abs(x);
+    var t = 1 / (1 + 0.3275911 * x);
+    var y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+    return s * y;
+  }
+  function pAbove(r) { return 0.5 * (1 - erf(Math.log(r / MED) / (SIG * Math.SQRT2))); }
+  function pdf(r) { var z = Math.log(r / MED) / SIG; return Math.exp(-0.5 * z * z) / (r * SIG * Math.sqrt(2 * Math.PI)); }
+
+  // doublings after t years; Infinity once past blow-up
+  function x(t, r, g0, beta) {
+    var k = beta * (r - 1);
+    if (Math.abs(k) < 1e-9) return g0 * t;
+    var a = 1 - k * LN2 * g0 * t;
+    return a <= 0 ? Infinity : -Math.log2(a) / k;
+  }
+  function tReach(X, r, g0, beta) {
+    var k = beta * (r - 1);
+    if (Math.abs(k) < 1e-9) return X / g0;
+    return (1 - Math.pow(2, -k * X)) / (k * LN2 * g0);
+  }
+  function fmtYears(t) {
+    if (!isFinite(t)) return 'never';
+    if (t < 1) return Math.round(t * 12) + ' mo';
+    return (t < 10 ? t.toFixed(1) : Math.round(t)) + ' yr';
+  }
+  var pct = function (p) { return Math.round(p * 100) + '%'; };
+
+  function render() {
+    var r = +$('r').value, g0 = +$('g0').value, beta = +$('beta').value, oom = +$('cap').value;
+    var cap = oom * Math.log2(10);
+    $('r-out').textContent = r.toFixed(2);
+    $('g0-out').textContent = g0;
+    $('beta-out').textContent = beta.toFixed(2);
+    $('cap-out').textContent = oom + ' (' + Math.round(cap) + ' doublings)';
+
+    var tc = tReach(cap, r, g0, beta), tc1 = cap / g0;
+    var k = beta * (r - 1);
+    $('s-ceil').textContent = fmtYears(tc);
+    $('s-ceil1').textContent = fmtYears(tc1);
+    $('s-blow').textContent = k > 0 ? fmtYears(1 / (k * LN2 * g0)) : 'none (r ≤ 1)';
+
+    var T = Math.min(30, Math.max(3, tc1 * 1.4));
+    var N = 300, runs = [
+      { name: 'Your r = ' + r.toFixed(2), r: r, color: 'var(--series-1)' },
+      { name: 'Forethought median r = 1.2', r: 1.2, color: 'var(--series-2)' },
+      { name: 'r = 1 (no feedback)', r: 1, color: 'var(--muted)', dashed: true }
+    ];
+    var series = runs.map(function (run) {
+      var pts = [];
+      for (var i = 0; i <= N; i++) {
+        var t = T * i / N, v = x(t, run.r, g0, beta);
+        if (!isFinite(v) || v > cap) { pts.push([tReach(cap, run.r, g0, beta), cap]); break; }
+        pts.push([t, v]);
+      }
+      return { name: run.name, color: run.color, dashed: run.dashed, points: pts };
+    });
+    Viz.line($('traj'), {
+      series: series, xDomain: [0, T], yDomain: [0, Math.ceil(cap / 5) * 5],
+      xLabel: 'Years from now', yLabel: 'Doublings of software',
+      fmtX: function (v) { return v + ''; }, fmtTipX: function (v) { return v.toFixed(1) + ' yr'; },
+      fmtY: function (v) { return Math.abs(v - Math.round(v)) < 1e-6 ? String(Math.round(v)) : v.toFixed(1); },
+      label: 'Software doublings over time for three values of r'
+    });
+
+    var rows = '<table><tr><th>Year</th>' + runs.map(function (r) { return '<th>' + r.name + '</th>'; }).join('') + '</tr>';
+    for (var y = 0; y <= Math.ceil(T); y++) {
+      rows += '<tr><td>' + y + '</td>' + runs.map(function (run) { var v = x(y, run.r, g0, beta); return '<td>' + (!isFinite(v) || v > cap ? 'ceiling' : v.toFixed(1)) + '</td>'; }).join('') + '</tr>';
+    }
+    $('traj-table').innerHTML = rows + '</table>';
+
+    $('s-p1').textContent = pct(pAbove(1));
+    $('s-pr').textContent = pct(pAbove(r));
+    var pts = [];
+    for (var j = 1; j <= 400; j++) { var rr = j * 0.0125; pts.push([rr, pdf(rr)]); }
+    Viz.line($('dist'), {
+      series: [{ name: 'Density of r', color: 'var(--series-1)', points: pts }],
+      fill: { from: 1, to: 5, color: 'var(--series-1)' },
+      xMarkers: [{ x: 1, label: 'r = 1' }, { x: r, label: 'your r', color: 'var(--series-2)' }],
+      xDomain: [0, 5], yDomain: [0, 0.8], height: 220,
+      xLabel: 'r', yLabel: 'Density',
+      fmtTipX: function (v) { return v.toFixed(2); }, fmtY: function (v) { return v.toFixed(2); },
+      label: 'Lognormal distribution of r, median 1.2, shaded above 1'
+    });
+  }
+  ['r', 'g0', 'beta', 'cap'].forEach(function (id) { $(id).addEventListener('input', render); });
+  render();
+})();
+</script>

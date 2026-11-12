@@ -1,0 +1,39 @@
+---
+layout: default
+---
+{% assign qs = site.questions | sort: 'qn' %}
+<article class="question-page">
+  <header class="entry-head">
+    <div class="meta">
+      <span class="qnum">Link {{ page.qn }} of {{ qs.size }}</span>
+      <span class="status status-{{ page.status_class }}">{{ page.status }}</span>
+    </div>
+    <h1>{{ page.title }}</h1>
+  </header>
+
+  <div class="prose">
+    {{ content }}
+  </div>
+
+  <section class="q-entries">
+    <h2>Entries on this link</h2>
+    {% assign found = false %}
+    <ul class="entry-list">
+    {% for p in site.posts %}{% if p.questions contains page.qn %}
+      {% assign found = true %}
+      <li>
+        <span class="kind kind-{{ p.kind }}">{{ p.kind }}</span>
+        <a href="{{ p.url | relative_url }}">{{ p.title }}</a>
+        <time>{{ p.date | date: "%-d %b %Y" }}</time>
+      </li>
+    {% endif %}{% endfor %}
+    </ul>
+    {% unless found %}<p class="empty">Nothing yet. This link is wide open for an experiment.</p>{% endunless %}
+  </section>
+
+  {% assign prev_qn = page.qn | minus: 1 %}{% assign next_qn = page.qn | plus: 1 %}
+  <nav class="q-pager">
+    <span>{% for q in qs %}{% if q.qn == prev_qn %}<a href="{{ q.url | relative_url }}">← Q{{ q.qn }} · {{ q.short }}</a>{% endif %}{% endfor %}</span>
+    <span>{% for q in qs %}{% if q.qn == next_qn %}<a href="{{ q.url | relative_url }}">Q{{ q.qn }} · {{ q.short }} →</a>{% endif %}{% endfor %}</span>
+  </nav>
+</article>

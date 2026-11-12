@@ -1,0 +1,46 @@
+---
+layout: default
+---
+{% assign qs = site.questions | sort: 'qn' %}
+<section class="hero">
+  <h1>RSI Scratchpad</h1>
+  <p>Vibecoded experiments and rough posts on <strong>recursive self-improvement</strong>. The risk argument is split into a chain of seven links. Every entry here tries to move the needle on one or more of them.</p>
+</section>
+
+<section id="chain" class="chain">
+  <h2>The chain</h2>
+  <ol class="chain-list">
+  {% for q in qs %}
+    {% assign n = 0 %}
+    {% for p in site.posts %}{% if p.questions contains q.qn %}{% assign n = n | plus: 1 %}{% endif %}{% endfor %}
+    <li class="chain-item">
+      <a href="{{ q.url | relative_url }}">
+        <span class="chain-num">{{ q.qn }}</span>
+        <span class="chain-body">
+          <span class="chain-title">{{ q.title }}</span>
+          <span class="chain-blurb">{{ q.blurb }}</span>
+        </span>
+        <span class="chain-side">
+          <span class="status status-{{ q.status_class }}">{{ q.status }}</span>
+          <span class="chain-count">{{ n }} {% if n == 1 %}entry{% else %}entries{% endif %}</span>
+        </span>
+      </a>
+    </li>
+  {% endfor %}
+  </ol>
+</section>
+
+<section class="recent">
+  <h2>Recent entries</h2>
+  <ul class="entry-list">
+  {% for p in site.posts limit: 10 %}
+    <li>
+      <span class="kind kind-{{ p.kind }}">{{ p.kind }}</span>
+      <a href="{{ p.url | relative_url }}">{{ p.title }}</a>
+      <span class="qrefs">{% for q in qs %}{% if p.questions contains q.qn %}<a class="qtag small" href="{{ q.url | relative_url }}">Q{{ q.qn }}</a>{% endif %}{% endfor %}</span>
+      <time>{{ p.date | date: "%-d %b %Y" }}</time>
+    </li>
+  {% endfor %}
+  </ul>
+  <p><a href="{{ '/entries/' | relative_url }}">All entries →</a></p>
+</section>

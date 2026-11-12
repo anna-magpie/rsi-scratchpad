@@ -1,0 +1,23 @@
+title: RSI Scratchpad
+description: Vibecoded ideas and experiments for understanding recursive self-improvement, one link of the risk argument at a time.
+baseurl: "/rsi-scratchpad"   # change to "" if you serve from a user site or custom domain
+url: ""
+timezone: UTC
+markdown: kramdown
+permalink: /:year/:month/:day/:title/
+
+collections:
+  questions:
+    output: true
+    permalink: /questions/:name/
+
+defaults:
+  - scope: { path: "", type: posts }
+    values: { layout: post, kind: post }
+  - scope: { path: "", type: questions }
+    values: { layout: question }
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock

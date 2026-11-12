@@ -1,0 +1,35 @@
+---
+layout: default
+title: Entries
+permalink: /entries/
+---
+{% assign qs = site.questions | sort: 'qn' %}
+<h1>All entries</h1>
+<div class="filters" role="group" aria-label="Filter entries">
+  <button class="chip active" data-filter="all">All</button>
+  <button class="chip" data-filter="experiment">Experiments</button>
+  <button class="chip" data-filter="post">Posts</button>
+  {% for q in qs %}<button class="chip" data-filter="q{{ q.qn }}">Q{{ q.qn }}</button>{% endfor %}
+</div>
+<ul class="entry-list" id="all-entries">
+{% for p in site.posts %}
+  <li data-kind="{{ p.kind }}" data-qs="{% for n in p.questions %}q{{ n }} {% endfor %}">
+    <span class="kind kind-{{ p.kind }}">{{ p.kind }}</span>
+    <a href="{{ p.url | relative_url }}">{{ p.title }}</a>
+    <span class="qrefs">{% for q in qs %}{% if p.questions contains q.qn %}<a class="qtag small" href="{{ q.url | relative_url }}">Q{{ q.qn }}</a>{% endif %}{% endfor %}</span>
+    <time>{{ p.date | date: "%-d %b %Y" }}</time>
+    {% if p.summary %}<p class="entry-summary">{{ p.summary }}</p>{% endif %}
+  </li>
+{% endfor %}
+</ul>
+<script>
+document.querySelectorAll('.filters .chip').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('.filters .chip').forEach(function (c) { c.classList.toggle('active', c === b); });
+    var f = b.dataset.filter;
+    document.querySelectorAll('#all-entries > li').forEach(function (li) {
+      li.hidden = !(f === 'all' || li.dataset.kind === f || (' ' + li.dataset.qs).indexOf(' ' + f + ' ') !== -1);
+    });
+  });
+});
+</script>
